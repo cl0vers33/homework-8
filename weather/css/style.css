@@ -73,6 +73,22 @@ body {
   border: 2px dashed #a9c4d8;
 }
 
+/* 天气记录卡片 */
+.day-card {
+  border: none;
+  box-shadow: 0 2px 10px rgba(23, 105, 170, 0.08);
+}
+
+.day-card:hover {
+  box-shadow: 0 6px 18px rgba(23, 105, 170, 0.15);
+}
+
+/* 空结果提示 */
+.empty-box {
+  background-color: #e9f2f8;
+  border: 2px dashed #a9c4d8;
+}
+
 /* 页脚 */
 .weather-footer {
   background-color: #e2edf5;

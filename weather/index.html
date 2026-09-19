@@ -112,20 +112,66 @@
       </div>
     </section>
 
-    <!-- ===== 天气查询区块（第二步实现，先放占位文字） ===== -->
+    <!-- ===== 天气查询区块：筛选交互（复用课堂五事件委托模式） ===== -->
     <section id="query" class="weather-section d-none">
-      <h2 class="h4 mb-3">天气查询</h2>
-      <div class="placeholder-box p-5 rounded-3 text-center text-secondary">
-        【占位】此处将在第二步实现：按天气状况 / 气温区间筛选七日天气记录。
+      <!-- 数据加载失败 / 空数据提示位（错误三状态之一） -->
+      <div id="queryAlert" class="alert d-none" role="alert"></div>
+
+      <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
+        <h2 class="h4 mb-0">七日天气记录</h2>
+        <span id="dayCount" class="badge text-bg-primary fs-6" aria-live="polite"></span>
       </div>
+
+      <!-- 筛选栏：天气状况 + 气温区间 -->
+      <form id="dayFilters" class="row g-3 mb-4">
+        <div class="col-sm-6 col-lg-4">
+          <label class="form-label" for="filterCondition">天气状况</label>
+          <select class="form-select" id="filterCondition" name="condition">
+            <option value="all">全部日子</option>
+            <option value="rain">仅降水日</option>
+            <option value="sunny">仅无降水日</option>
+          </select>
+        </div>
+        <div class="col-sm-6 col-lg-4">
+          <label class="form-label" for="filterTemp">气温区间（按当日最高温）</label>
+          <select class="form-select" id="filterTemp" name="temp">
+            <option value="all">全部气温</option>
+            <option value="warm">温暖（&ge; 22℃）</option>
+            <option value="cool">凉爽（&lt; 22℃）</option>
+          </select>
+        </div>
+        <div class="col-sm-6 col-lg-4">
+          <label class="form-label" for="filterKeyword">关键字</label>
+          <input type="search" class="form-control" id="filterKeyword"
+                 name="keyword" placeholder="输入日期，如 9月8日">
+        </div>
+      </form>
+
+      <!-- 天气卡片列表（render 前先清空，避免残留旧结果） -->
+      <div id="dayList" class="row g-3"></div>
     </section>
 
-    <!-- ===== 数据看板区块（第二步实现，先放占位文字） ===== -->
+    <!-- ===== 数据看板区块：ECharts 柱状图 + Chart.js 折线图 ===== -->
     <section id="board" class="weather-section d-none">
-      <h2 class="h4 mb-3">数据看板</h2>
-      <div class="placeholder-box p-5 rounded-3 text-center text-secondary">
-        【占位】此处将在第二步实现：加载 weather.json，渲染降水量柱状图与气温折线图。
+      <div id="boardAlert" class="alert d-none" role="alert"></div>
+      <div class="row g-4">
+        <div class="col-lg-6">
+          <div class="card h-100">
+            <div class="card-body">
+              <!-- 容器必须定高，防止高度为 0 图表不显示 -->
+              <div id="rainChart" style="height:340px;"></div>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-6">
+          <div class="card h-100">
+            <div class="card-body">
+              <canvas id="tempChart" height="220" aria-label="七日气温折线图"></canvas>
+            </div>
+          </div>
+        </div>
       </div>
+      <p class="text-secondary small mt-3" id="boardSource"></p>
     </section>
   </main>
 
@@ -133,9 +179,13 @@
     <div class="container">自主实践 · 昆明天气信息中心 · 示例数据仅供教学使用</div>
   </footer>
 
-  <!-- 3. 库脚本在前（jQuery → Bootstrap），自己的 app.js 在后 -->
+  <!-- 3. 库脚本在前（jQuery → Bootstrap → ECharts → Chart.js），自己的 app.js 在后 -->
   <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.1/dist/echarts.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+  <!-- 兜底数据必须在 app.js 之前加载（file:// 下 fetch 被禁时使用） -->
+  <script src="data/weather.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>
