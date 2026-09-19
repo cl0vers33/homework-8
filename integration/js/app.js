@@ -63,6 +63,15 @@
 
   /* ---------- data：加载 data.json ---------- */
   async function loadUsageData() {
+    // file:// 协议下浏览器会在网络层拦截对本地文件的读取（产生红色报错），
+    // 直接使用内置示例数据并提示，保证 Console 干净
+    if (location.protocol === 'file:') {
+      return {
+        data: USAGE_FALLBACK,
+        notice: '当前以 file:// 方式直接打开，浏览器禁止读取本地 data.json，' +
+                '已使用内置示例数据；通过本地服务器打开可加载 data.json。'
+      };
+    }
     try {
       const response = await fetch('data/data.json');
       if (!response.ok) {

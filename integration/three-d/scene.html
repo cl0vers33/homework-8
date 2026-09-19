@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="校园三维导览 - Three.js 场景">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' rx='3' fill='%230d4a8f'/%3E%3Ctext x='8' y='12' font-size='10' text-anchor='middle' fill='white'%3E%E6%A0%A1%3C/text%3E%3C/svg%3E">
+  <title>校园三维导览 - 迷你版校园信息中心</title>
+  <!-- 库样式：Bootstrap 5.3.3 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="../css/style.css" rel="stylesheet">
+  <style>
+    html, body { height: 100%; }
+    #sceneWrap { position: relative; height: calc(100vh - 160px); min-height: 380px; }
+    #sceneCanvas { width: 100%; height: 100%; display: block; border-radius: .5rem; }
+    #sceneTip {
+      position: absolute; left: 12px; bottom: 12px;
+      background: rgba(13, 74, 143, .82); color: #fff;
+      padding: 6px 12px; border-radius: 20px; font-size: .85rem;
+    }
+  </style>
+</head>
+<body>
+  <!-- ===== 与主页面一致的导航栏 ===== -->
+  <nav class="navbar navbar-expand-lg navbar-dark campus-navbar sticky-top">
+    <div class="container">
+      <a class="navbar-brand fw-bold" href="../index.html#home">校园信息中心</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+              data-bs-target="#mainNav" aria-controls="mainNav"
+              aria-expanded="false" aria-label="展开导航菜单">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="mainNav">
+        <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+          <li class="nav-item"><a class="nav-link" href="../index.html#home">首页</a></li>
+          <li class="nav-item"><a class="nav-link" href="../index.html#rooms">自习室</a></li>
+          <li class="nav-item"><a class="nav-link" href="../index.html#stats">统计</a></li>
+          <li class="nav-item"><a class="nav-link active" aria-current="page" href="scene.html">校园三维</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container py-4">
+    <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
+      <h1 class="h4 mb-0">校园三维导览</h1>
+      <a class="btn btn-outline-primary btn-sm" href="../index.html#home">&larr; 返回首页</a>
+    </div>
+
+    <!-- 场景容器：Three.js 库加载失败时在此显示提示 -->
+    <div id="sceneWrap">
+      <div id="sceneAlert" class="alert alert-warning d-none mb-0" role="alert"></div>
+      <canvas id="sceneCanvas" aria-label="校园三维场景画布"></canvas>
+      <div id="sceneTip">拖拽旋转视角 · 自动环绕浏览</div>
+    </div>
+  </main>
+
+  <footer class="campus-footer text-center py-3 mt-auto text-secondary">
+    <div class="container">课堂八案例复现 · Three.js 校园三维导览 · 场景为示意模型</div>
+  </footer>
+
+  <!-- 库脚本：固定版本号 Three.js r149（UMD 全局 THREE） -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.149.0/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+  /* ===== 校园三维导览场景（课堂七场景模式） ===== */
+  (function () {
+    'use strict';
+
+    const canvas = document.getElementById('sceneCanvas');
+    const alertBox = document.getElementById('sceneAlert');
+
+    function fail(message) {
+      canvas.classList.add('d-none');
+      alertBox.classList.remove('d-none');
+      alertBox.textContent = message;
+    }
+
+    if (typeof THREE === 'undefined') {
+      fail('Three.js 加载失败，请检查网络连接后刷新页面。');
+      return;
+    }
+
+    // ---- 场景 / 相机 / 渲染器 ----
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0xdfeaf6);
+    scene.fog = new THREE.Fog(0xdfeaf6, 60, 110);
+
+    const camera = new THREE.PerspectiveCamera(50, 1, 0.1, 200);
+
+    const renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+    // ---- 灯光 ----
+    scene.add(new THREE.AmbientLight(0xffffff, 0.65));
+    const sun = new THREE.DirectionalLight(0xffffff, 1.1);
+    sun.position.set(22, 30, 14);
+    sun.castShadow = true;
+    sun.shadow.mapSize.set(1024, 1024);
+    sun.shadow.camera.left = -40;
+    sun.shadow.camera.right = 40;
+    sun.shadow.camera.top = 40;
+    sun.shadow.camera.bottom = -40;
+    scene.add(sun);
+
+    // ---- 地面与道路 ----
+    const ground = new THREE.Mesh(
+      new THREE.PlaneGeometry(90, 90),
+      new THREE.MeshStandardMaterial({ color: 0x9cc588 })
+    );
+    ground.rotation.x = -Math.PI / 2;
+    ground.receiveShadow = true;
+    scene.add(ground);
+
+    function addRoad(x, z, w, d) {
+      const road = new THREE.Mesh(
+        new THREE.BoxGeometry(w, 0.05, d),
+        new THREE.MeshStandardMaterial({ color: 0x8d99a5 })
+      );
+      road.position.set(x, 0.03, z);
+      road.receiveShadow = true;
+      scene.add(road);
+    }
+    addRoad(0, 0, 6, 90);
+    addRoad(0, 0, 90, 6);
+
+    // ---- 建筑：名称 / 位置 / 宽高深 / 颜色 ----
+    const buildings = [
+      { name: '图书馆',   x: 0,   z: -14, w: 10, h: 12, d: 8,  color: 0x2e7fc2 },
+      { name: '教学楼A',  x: -18, z: -10, w: 9,  h: 8,  d: 9,  color: 0xe8a33d },
+      { name: '教学楼B',  x: 18,  z: -10, w: 9,  h: 8,  d: 9,  color: 0xe8a33d },
+      { name: '食堂',     x: -18, z: 14,  w: 9,  h: 5,  d: 7,  color: 0xd9603f },
+      { name: '体育馆',   x: 18,  z: 14,  w: 11, h: 4.5,d: 9,  color: 0x4aa88a },
+      { name: '行政楼',   x: 0,   z: 20,  w: 8,  h: 7,  d: 6,  color: 0x7b6bb0 }
+    ];
+
+    // ---- 文字标签（Canvas 纹理精灵） ----
+    function makeLabel(text) {
+      const c = document.createElement('canvas');
+      c.width = 256; c.height = 64;
+      const ctx = c.getContext('2d');
+      ctx.fillStyle = 'rgba(13, 74, 143, 0.85)';
+      ctx.fillRect(0, 0, 256, 64);
+      ctx.font = 'bold 30px sans-serif';
+      ctx.fillStyle = '#ffffff';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(text, 128, 32);
+      const texture = new THREE.CanvasTexture(c);
+      const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: texture }));
+      sprite.scale.set(7, 1.75, 1);
+      return sprite;
+    }
+
+    buildings.forEach((b) => {
+      const mesh = new THREE.Mesh(
+        new THREE.BoxGeometry(b.w, b.h, b.d),
+        new THREE.MeshStandardMaterial({ color: b.color })
+      );
+      mesh.position.set(b.x, b.h / 2, b.z);
+      mesh.castShadow = true;
+      mesh.receiveShadow = true;
+      scene.add(mesh);
+
+      const label = makeLabel(b.name);
+      label.position.set(b.x, b.h + 1.6, b.z);
+      scene.add(label);
+    });
+
+    // ---- 视角控制：自动环绕 + 拖拽旋转 ----
+    let angle = 0;
+    let tilt = 0.42;
+    const radius = 42;
+    let dragging = false;
+    let lastX = 0;
+    let lastY = 0;
+
+    function updateCamera() {
+      camera.position.x = radius * Math.sin(angle) * Math.cos(tilt);
+      camera.position.z = radius * Math.cos(angle) * Math.cos(tilt);
+      camera.position.y = radius * Math.sin(tilt);
+      camera.lookAt(0, 3, 0);
+    }
+
+    canvas.addEventListener('pointerdown', (e) => {
+      dragging = true;
+      lastX = e.clientX;
+      lastY = e.clientY;
+      canvas.setPointerCapture(e.pointerId);
+    });
+    canvas.addEventListener('pointermove', (e) => {
+      if (!dragging) return;
+      angle -= (e.clientX - lastX) * 0.006;
+      tilt = Math.min(1.2, Math.max(0.1, tilt + (e.clientY - lastY) * 0.004));
+      lastX = e.clientX;
+      lastY = e.clientY;
+    });
+    canvas.addEventListener('pointerup', () => { dragging = false; });
+    canvas.addEventListener('pointercancel', () => { dragging = false; });
+
+    // ---- 尺寸自适应 ----
+    function resize() {
+      const width = canvas.clientWidth;
+      const height = canvas.clientHeight;
+      if (width === 0 || height === 0) return;
+      renderer.setPixelRatio(window.devicePixelRatio);
+      renderer.setSize(width, height, false);
+      camera.aspect = width / height;
+      camera.updateProjectionMatrix();
+    }
+    window.addEventListener('resize', resize);
+
+    // ---- 渲染循环；页面隐藏时停止，返回后不再卡顿 ----
+    let frameId = null;
+    function animate() {
+      if (!dragging) angle += 0.0016;
+      updateCamera();
+      renderer.render(scene, camera);
+      frameId = requestAnimationFrame(animate);
+    }
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden && frameId !== null) {
+        cancelAnimationFrame(frameId);
+        frameId = null;
+      } else if (!document.hidden && frameId === null) {
+        animate();
+      }
+    });
+    window.addEventListener('pagehide', () => {
+      if (frameId !== null) cancelAnimationFrame(frameId);
+      renderer.dispose();
+    });
+
+    resize();
+    animate();
+  })();
+  </script>
+</body>
+</html>
