@@ -56,6 +56,22 @@ body {
   border: 2px dashed #b8c6d9;
 }
 
+/* 自习室卡片 */
+.room-card {
+  border: none;
+  box-shadow: 0 2px 10px rgba(13, 74, 143, 0.08);
+}
+
+.room-card:hover {
+  box-shadow: 0 6px 18px rgba(13, 74, 143, 0.15);
+}
+
+/* 空结果提示 */
+.empty-box {
+  background-color: #eef2f8;
+  border: 2px dashed #b8c6d9;
+}
+
 /* 页脚 */
 .campus-footer {
   background-color: #e9eef6;
