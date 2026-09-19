@@ -1,0 +1,80 @@
+/* ===== 昆明天气信息中心 自定义样式 ===== */
+:root {
+  --wx-primary: #1769aa;
+  --wx-accent: #29a3a3;
+  --wx-bg: #f2f8fb;
+}
+
+body {
+  background-color: var(--wx-bg);
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* 导航栏 */
+.weather-navbar {
+  background: linear-gradient(90deg, #0d4a8f 0%, #1769aa 60%, #29a3a3 100%);
+}
+
+.weather-navbar .nav-link {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.weather-navbar .nav-link:hover,
+.weather-navbar .nav-link:focus {
+  color: #fff;
+}
+
+.weather-navbar .nav-link.active {
+  color: #fff;
+  font-weight: 600;
+  border-bottom: 2px solid #fff;
+}
+
+/* 首页横幅：天空渐变 */
+.hero-box {
+  background: linear-gradient(120deg, #0d4a8f 0%, #1769aa 45%, #29a3a3 100%);
+}
+
+/* 摘要卡片 */
+.summary-card {
+  border: none;
+  box-shadow: 0 2px 10px rgba(23, 105, 170, 0.08);
+}
+
+.summary-value {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--wx-primary);
+}
+
+/* 数据未加载时的占位灰字 */
+.placeholder-grey {
+  color: #9db4c8;
+}
+
+/* 模块卡片 */
+.module-card {
+  border: none;
+  box-shadow: 0 2px 10px rgba(23, 105, 170, 0.08);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.module-card:hover,
+.module-card:focus-within {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 22px rgba(23, 105, 170, 0.16);
+}
+
+/* 占位区块 */
+.placeholder-box {
+  background-color: #e9f2f8;
+  border: 2px dashed #a9c4d8;
+}
+
+/* 页脚 */
+.weather-footer {
+  background-color: #e2edf5;
+  font-size: 0.9rem;
+}

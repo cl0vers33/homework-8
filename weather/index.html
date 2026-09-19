@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="昆明天气信息中心 - 个人技术整合练习（自主实践）">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' rx='3' fill='%231769aa'/%3E%3Ctext x='8' y='12' font-size='10' text-anchor='middle' fill='white'%3E%E6%98%86%3C/text%3E%3C/svg%3E">
+  <title>昆明天气信息中心</title>
+  <!-- 1. 库样式在前：Bootstrap 5.3.3（固定版本号） -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- 2. 自定义样式在后：保证能覆盖库样式 -->
+  <link href="css/style.css" rel="stylesheet">
+</head>
+<body>
+  <!-- ===== 统一入口导航：四个模块入口 ===== -->
+  <nav class="navbar navbar-expand-lg navbar-dark weather-navbar sticky-top">
+    <div class="container">
+      <a class="navbar-brand fw-bold" href="#home">昆明天气信息中心</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+              data-bs-target="#mainNav" aria-controls="mainNav"
+              aria-expanded="false" aria-label="展开导航菜单">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="mainNav">
+        <ul class="navbar-nav ms-auto mb-2 mb-lg-0" id="navMenu">
+          <li class="nav-item"><a class="nav-link" data-section="home" href="#home">首页</a></li>
+          <li class="nav-item"><a class="nav-link" data-section="query" href="#query">天气查询</a></li>
+          <li class="nav-item"><a class="nav-link" data-section="board" href="#board">数据看板</a></li>
+          <li class="nav-item"><a class="nav-link" href="three-d/scene.html">三维昆明</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container py-4">
+    <!-- ===== 首页区块 ===== -->
+    <section id="home" class="weather-section">
+      <div class="p-4 p-md-5 rounded-3 hero-box text-white mb-4">
+        <h1 class="display-6 fw-bold">昆明天气信息中心</h1>
+        <p class="col-lg-8 lead mb-0">
+          个人技术整合练习：把页面结构、样式、交互、数据、可视化、三维六个课堂模块
+          组装为一个以"昆明天气"为主题的统一作品，作为期末大作业的原型。
+        </p>
+      </div>
+
+      <!-- 本周天气摘要：数据来自 weather.json，第二步由脚本自动计算填充 -->
+      <h2 class="h4 mb-3">本周天气摘要</h2>
+      <div class="row g-3 mb-4" id="summaryRow">
+        <div class="col-6 col-lg-3">
+          <div class="card summary-card text-center">
+            <div class="card-body">
+              <div class="summary-value placeholder-grey">&mdash;</div>
+              <div class="summary-label text-secondary">周均最高温</div>
+            </div>
+          </div>
+        </div>
+        <div class="col-6 col-lg-3">
+          <div class="card summary-card text-center">
+            <div class="card-body">
+              <div class="summary-value placeholder-grey">&mdash;</div>
+              <div class="summary-label text-secondary">降水日数</div>
+            </div>
+          </div>
+        </div>
+        <div class="col-6 col-lg-3">
+          <div class="card summary-card text-center">
+            <div class="card-body">
+              <div class="summary-value placeholder-grey">&mdash;</div>
+              <div class="summary-label text-secondary">周总降水量</div>
+            </div>
+          </div>
+        </div>
+        <div class="col-6 col-lg-3">
+          <div class="card summary-card text-center">
+            <div class="card-body">
+              <div class="summary-value placeholder-grey">&mdash;</div>
+              <div class="summary-label text-secondary">数据来源</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <h2 class="h4 mb-3">功能导航</h2>
+      <div class="row g-4">
+        <div class="col-sm-6 col-lg-4">
+          <div class="card h-100 module-card">
+            <div class="card-body">
+              <h3 class="h5 card-title">天气查询</h3>
+              <p class="card-text text-secondary">按天气状况与气温区间筛选七日天气记录，快速找到目标日子。</p>
+              <a class="btn btn-outline-primary" data-section="query" href="#query">进入查询</a>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-6 col-lg-4">
+          <div class="card h-100 module-card">
+            <div class="card-body">
+              <h3 class="h5 card-title">数据看板</h3>
+              <p class="card-text text-secondary">ECharts 降水量柱状图与 Chart.js 气温折线图，数据来自 weather.json。</p>
+              <a class="btn btn-outline-primary" data-section="board" href="#board">查看看板</a>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-6 col-lg-4">
+          <div class="card h-100 module-card">
+            <div class="card-body">
+              <h3 class="h5 card-title">三维昆明</h3>
+              <p class="card-text text-secondary">Three.js 三维城市意象场景，从空中环绕浏览春城天际线。</p>
+              <a class="btn btn-outline-primary" href="three-d/scene.html">进入三维场景</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== 天气查询区块（第二步实现，先放占位文字） ===== -->
+    <section id="query" class="weather-section d-none">
+      <h2 class="h4 mb-3">天气查询</h2>
+      <div class="placeholder-box p-5 rounded-3 text-center text-secondary">
+        【占位】此处将在第二步实现：按天气状况 / 气温区间筛选七日天气记录。
+      </div>
+    </section>
+
+    <!-- ===== 数据看板区块（第二步实现，先放占位文字） ===== -->
+    <section id="board" class="weather-section d-none">
+      <h2 class="h4 mb-3">数据看板</h2>
+      <div class="placeholder-box p-5 rounded-3 text-center text-secondary">
+        【占位】此处将在第二步实现：加载 weather.json，渲染降水量柱状图与气温折线图。
+      </div>
+    </section>
+  </main>
+
+  <footer class="weather-footer text-center py-3 mt-auto text-secondary">
+    <div class="container">自主实践 · 昆明天气信息中心 · 示例数据仅供教学使用</div>
+  </footer>
+
+  <!-- 3. 库脚本在前（jQuery → Bootstrap），自己的 app.js 在后 -->
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
